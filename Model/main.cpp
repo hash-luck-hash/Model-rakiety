@@ -39,9 +39,10 @@ void v_m(gnuplot &p) {
 void a_r(gnuplot &p) {
 	p("set xrange [0:2000]");
 
-	//plot a
-	p("a(r)=u*r/m-g");
-	p("plot a(r)");
+	//plot a1 and a2
+	p("a1(r)=u*r/m");
+	p("a2(r)=u*r/m-g");
+	p("plot a1(x),a2(x)");
 }
 int main() {
 	std::cout.precision(15);
@@ -63,6 +64,10 @@ int main() {
 	v_m(r);
 	//a(r)
 	a_r(q);
+
+	for (int i = 0; i < 1000; i++) {
+		//std::cout <<i<<" : "<< u * i / m - G<<"\n";
+	}
 
 	return 0;
 }
