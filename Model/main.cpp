@@ -25,7 +25,11 @@ void v_t(gnuplot &p) {
 	//plot v1 and v2
 	p("v1(t)=u*log(m/(m-r*t))");
 	p("v2(t)=u*log(m/(m-r*t))-g*t");
-	p("plot v1(x),v2(x)"); 
+	p("der(t)=(m*g-r*u)/(r*g)");
+	p("vv2(t)=(0<=t&&t<der(t)) ? 0 : v2(t)-v2(der(t))");
+	p("v1_r(t)=(0<=t && t<=m*per/(100*r)) ? v1(t) : 1/0");
+	p("v2_r(t)=(0<=t && t<=m*per/(100*r)) ? vv2(t) : 1/0");
+	p("plot v1_r(x) title 'v(t) without g',v2_r(x) title 'v(t) with const g'"); 
 }
 void v_m(gnuplot &p) {
 	//setting range
@@ -34,15 +38,27 @@ void v_m(gnuplot &p) {
 	//plot v1 and v2
 	p("v_m1(x)=u*log(m/(m-r*((m-x)/r)))");
 	p("v_m2(x)=u*log(m/(m-r*((m-x)/r)))-g*((m-x)/r)");
-	p("plot v_m1(x),v_m2(x)");
+	p("der(x)=u*r/g");
+	p("vv_m2(x)=(der(x)<x&&x<=m) ? 0 : v_m2(x)-v_m2(der(x))");
+	p("v_m1_r(x)=(m*(100-per)/100<=x && x<=m) ? v_m1(x) : 1/0");
+	p("v_m2_r(x)=(m*(100-per)/100<=x && x<=m) ? vv_m2(x) : 1/0");
+	p("plot v_m1_r(x) title 'v(m) without g',v_m2_r(x) title 'v(m) with const g'");
 }
 void a_r(gnuplot &p) {
-	p("set xrange [0:2000]");
+	p("set xrange [0:10000]");
 
 	//plot a1 and a2
-	p("a1(r)=u*r/m");
-	p("a2(r)=u*r/m-g");
-	p("plot a1(x),a2(x)");
+	p("a1(r)=r>=0 ? ((u*r/m) >=0 ? (u*r/m) : 0) : 1/0");
+	p("a2(r)=r>=0 ? ((u*r/m-g) >=0 ? (u*r/m-g) : 0) : 1/0");
+	p("plot a1(x) title 'a(r) without g',a2(x) title 'a(r) with const g'");
+}
+void test(gnuplot &p) {
+	p("set xrange [0:30]");
+
+	p("f(x)=x**2-10*x");
+	p("p(x)=(0<=x&&x<5) ? 0 : f(x)+25");
+	p("r(x)=(0<=x&&x<=30) ? p(x) : 1/0");
+	p("plot r(x)");
 }
 int main() {
 	std::cout.precision(15);
@@ -52,18 +68,20 @@ int main() {
 	std::cout << "Podaj szybkosc wyrzutu paliwa: "; std::cin >> r;
 	std::cout << "Podaj predkosc wyrzucanego paliwa: "; std::cin >> u; std::cout << "\n";
 
-	gnuplot p, r, q;
+	gnuplot p, r, q, s;
 
 	//variables
 	define_variables(p);
 	define_variables(r);
 	define_variables(q);
 	//v(t) and const G
-	v_t(p);
+	//v_t(p);
 	//v_m(t) and const G
 	v_m(r);
 	//a(r)
-	a_r(q);
+	//a_r(q);
+	//test
+	//test(s);
 
 	for (int i = 0; i < 1000; i++) {
 		//std::cout <<i<<" : "<< u * i / m - G<<"\n";
