@@ -28,7 +28,7 @@ void v_t(gnuplot &p) {
 	p("der(t)=(m*g-r*u)/(r*g)");
 	p("vv2(t)=(0<=t&&t<der(t)) ? 0 : v2(t)-v2(der(t))");
 	p("v1_r(t)=(0<=t && t<=m*per/(100*r)) ? v1(t) : 1/0");
-	p("v2_r(t)=(0<=t && t<=m*per/(100*r)) ? vv2(t) : 1/0");
+	p("v2_r(t)=(0<=t && t<=m*per/(100*r)) ? (der(t)>=0 ? vv2(t) : v2(t)) : 1/0");
 	p("plot v1_r(x) title 'v(t) without g',v2_r(x) title 'v(t) with const g'"); 
 }
 void v_m(gnuplot &p) {
@@ -41,7 +41,7 @@ void v_m(gnuplot &p) {
 	p("der(x)=u*r/g");
 	p("vv_m2(x)=(der(x)<x&&x<=m) ? 0 : v_m2(x)-v_m2(der(x))");
 	p("v_m1_r(x)=(m*(100-per)/100<=x && x<=m) ? v_m1(x) : 1/0");
-	p("v_m2_r(x)=(m*(100-per)/100<=x && x<=m) ? vv_m2(x) : 1/0");
+	p("v_m2_r(x)=(m*(100-per)/100<=x && x<=m) ? (der(x)<=m ? vv_m2(x) : v_m2(x)) : 1/0");
 	p("plot v_m1_r(x) title 'v(m) without g',v_m2_r(x) title 'v(m) with const g'");
 }
 void a_r(gnuplot &p) {
@@ -52,14 +52,30 @@ void a_r(gnuplot &p) {
 	p("a2(r)=r>=0 ? ((u*r/m-g) >=0 ? (u*r/m-g) : 0) : 1/0");
 	p("plot a1(x) title 'a(r) without g',a2(x) title 'a(r) with const g'");
 }
-void test(gnuplot &p) {
-	p("set xrange [0:30]");
-
-	p("f(x)=x**2-10*x");
-	p("p(x)=(0<=x&&x<5) ? 0 : f(x)+25");
-	p("r(x)=(0<=x&&x<=30) ? p(x) : 1/0");
-	p("plot r(x)");
+/*double f(double t) {
+	return u * log(m / (m - r * t));
 }
+double Integral(double a, double b) {
+	double area = 0.0;
+	double E = 1e-3;
+	double length = (double)(b - a) / 2;
+	long long ile = 2;
+	double P1 = 0;
+	double P2 = f(a)*length + f(a + length)*length;
+	//double P2 = pol.func(a)*length+pol.func(a+length)*length;
+	while (abs(P1 - P2) > E) {
+		std::cout << P1 << " " << P2 <<" "<<E<< "\n";
+		P2 = P1;
+		P1 = 0;
+		length /= 2;
+		ile *= 2;
+		for (int i = 0; i < ile; i++) {
+			P1 += f(a + length * i)*length;
+			//P1 += pol.func(a+length*i)*length;
+		}
+	}
+	return P1;
+}*/
 int main() {
 	std::cout.precision(15);
 
@@ -68,24 +84,20 @@ int main() {
 	std::cout << "Podaj szybkosc wyrzutu paliwa: "; std::cin >> r;
 	std::cout << "Podaj predkosc wyrzucanego paliwa: "; std::cin >> u; std::cout << "\n";
 
-	gnuplot p, r, q, s;
+	gnuplot pg, rg, qg;
 
 	//variables
-	define_variables(p);
-	define_variables(r);
-	define_variables(q);
+	define_variables(pg);
+	define_variables(rg);
+	define_variables(qg);
 	//v(t) and const G
-	//v_t(p);
+	v_t(pg);
 	//v_m(t) and const G
-	v_m(r);
+	v_m(rg);
 	//a(r)
-	//a_r(q);
-	//test
-	//test(s);
+	a_r(qg);
 
-	for (int i = 0; i < 1000; i++) {
-		//std::cout <<i<<" : "<< u * i / m - G<<"\n";
-	}
+	//std::cout << Integral(0, m*per / (100 * r)) << "\n";
 
 	return 0;
 }
