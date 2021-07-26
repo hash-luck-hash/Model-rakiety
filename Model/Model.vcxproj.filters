@@ -25,7 +25,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="dane.txt">
+    <Text Include="do_poprawy.txt">
       <Filter>Pliki źródłowe</Filter>
     </Text>
   </ItemGroup>
